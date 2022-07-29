@@ -1,13 +1,8 @@
-﻿using HelloApp.Models;
+﻿using HelloApp6.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace HelloApp.Controllers
+namespace HelloApp6.Controllers
 {
     public class HomeController : Controller
     {
