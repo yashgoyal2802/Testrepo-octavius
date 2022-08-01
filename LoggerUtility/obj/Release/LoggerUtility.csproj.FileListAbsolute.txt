@@ -1,0 +1,5 @@
+D:\Genentech\InfraProjectFinal\IncedoReservoir\LoggerUtility\bin\Release\LoggerUtility.dll
+D:\Genentech\InfraProjectFinal\IncedoReservoir\LoggerUtility\bin\Release\LoggerUtility.pdb
+D:\Genentech\InfraProjectFinal\IncedoReservoir\LoggerUtility\obj\Release\LoggerUtility.dll
+D:\Genentech\InfraProjectFinal\IncedoReservoir\LoggerUtility\obj\Release\LoggerUtility.pdb
+D:\Genentech\InfraProjectFinal\IncedoReservoir\LoggerUtility\obj\Release\LoggerUtility.csprojResolveAssemblyReference.cache
