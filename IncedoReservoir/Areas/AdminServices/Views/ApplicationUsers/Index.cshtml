@@ -1,0 +1,680 @@
+﻿@model IncedoReservoir.Areas.AdminServices.Models.UserAddEditViewModel
+
+@{
+    Layout = "~/Areas/AdminServices/Views/Shared/_AdminServices_Layout.cshtml";
+    ViewBag.Title = "Admin Services";
+    string errorMessage = ViewBag.ErrorMessage;
+    string errorclass = "has-error";
+    if (string.IsNullOrEmpty(errorMessage))
+    {
+        errorclass = string.Empty;
+    }
+}
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<script type="text/javascript" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"> </script>
+<script src="~/Content/js/applicationUsersScript.js"></script>
+@section scripts {
+<script type="text/javascript">
+    function checkuser() {
+        var inputUserLoginName = $("#inputUserLoginName").val();
+
+        if ($("#inputUserLoginName").val() === "" || $("#inputUserLoginName").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('User Login Name cant be empty, Please enter User Login Name !!');
+            return false;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ValidateUserName", "ApplicationUsers")',
+            data: { strUserLoginName: inputUserLoginName },
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            success: function (data) {
+                if (data != 0 && data > 0) {
+                    $('#userAddErrorMsg').show();
+                    $('#userAddErrorMsg').text('User Login Name already exist ! Please try with different User Login Name !');
+                    $("#btnaddUser").attr("disabled", true);
+                    return false;
+                }
+                else {
+                    $('#userAddErrorMsg').hide();
+                    $('#userAddErrorMsg').text('');
+                    $("#btnaddUser").attr("disabled", false);
+                    return true;
+                }
+            }
+        });
+    }
+
+    function checkuserEdit() {
+        var inputUserLoginName = $("#inputUserLoginNameEdit").val();
+
+        if (inputUserLoginName == "") {
+            return true;
+        }
+
+        if ($("#inputUserLoginNameEdit").val().trim() != $("#hdUserLoginNameEdit").val().trim()) {
+
+            $.ajax({
+                url: '@Url.Action("ValidateUserName", "ApplicationUsers")',
+                data: { strUserLoginName: inputUserLoginName },
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                success: function (data) {
+                    if (data != 0 && data > 0) {
+                        $('#userAddErrorMsgEdit').show();
+                        $('#userAddErrorMsgEdit').text('User Login Name already exist ! Please try with different User Login Name !');
+                        return true;
+                    }
+                    else {
+                        $('#userAddErrorMsgEdit').hide();
+                        $('#userAddErrorMsgEdit').text('');
+                        return true;
+                    }
+                }
+            });
+        }
+    }
+
+    function addUserDetails(obj) {
+        if ($("#inputUserDisplayName").val() === "" || $("#inputUserDisplayName").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('User Display Name cant be empty, Please enter User Display Name !!');
+            return false;
+        }
+
+        if ($("#inputUserLoginName").val() === "" || $("#inputUserLoginName").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('User Login Name cant be empty, Please enter User Login Name !!');
+            return false;
+        }
+
+        if ($("#inputPassword").val() === "" || $("#inputPassword").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('Login Password cant be empty, Please enter Login Password !!');
+            return false;
+        }
+
+        if ($("select#ddlUserTypeAdd option:selected").val() === "0" || $("select#ddlUserTypeAdd option:selected").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('Please select User Type !!');
+            return false;
+        }
+
+        var selected = new Array();
+        $("#tblAssignedServices input[type=checkbox]:checked").each(function () {
+            selected.push(this.value);
+        });
+
+        if (selected === null || selected.length === 0) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('Please assign atleast one Services to new User !!');
+            return false;
+        }
+
+
+        if ($("select#ddlPrivilegeGroup option:selected").val() === "0" || $("select#ddlPrivilegeGroup option:selected").val() === null) {
+            $('#userAddErrorMsg').show();
+            $('#userAddErrorMsg').text('Please assign Privilege Group to new User !!');
+            return false;
+        }
+
+        var jsonStringVal = '{"iRecordId":0'
+                                + ', "sAccountType":"' + 'SO'
+                                + '", "iPrivilegeGroupId": "' + $("select#ddlPrivilegeGroup option:selected").val()
+                                + '", "sAssignedServiceList": "' + selected.join(",")
+                                + '", "sDisplayName":"' + $("#inputUserDisplayName").val()
+                                + '", "sLoginName":"' + $("#inputUserLoginName").val()
+                                 + '", "sUserType":"' + $("select#ddlUserTypeAdd option:selected").val()
+                                + '", "sLoginPassword":"' + $("#inputPassword").val()
+                                + '", "iStatus":' + $("select#ddlUserActiveStatus option:selected").val()
+                                + ', "iLoggedUserId": 1'
+                                + ', "iLoggedAccountId": 1'
+                                + ', "iAction": 1'
+                                + "}"
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveUserDetails")',
+            data: jsonStringVal,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                location.reload();
+                //fnShowMessageBox("Rank Weightage Management", "<br/>Default Rank Attribute Weightages have been set successfully!<br /> <br/> Expert Portal Team", 1, function abc() { }, null);
+            },
+            error: function (error) {
+                alert('error; ' + eval(error));
+            },
+        });
+    }
+
+    function editSaveUserDetails(obj) {
+        if ($("#inputUserDisplayNameEdit").val() === "" || $("#inputUserDisplayNameEdit").val() === null) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('User Display Name cant be empty, Please enter User Display Name !!');
+            return false;
+        }
+
+        if ($("#inputUserLoginNameEdit").val() === "" || $("#inputUserLoginNameEdit").val() === null) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('User Login Name cant be empty, Please enter User Login Name !!');
+            return false;
+        }
+
+        if ($("#inputPasswordEdit").val() === "" || $("#inputPasswordEdit").val() === null) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('Login Password cant be empty, Please enter Login Password !!');
+            return false;
+        }
+
+
+        if ($("select#ddlUserTypeEdit option:selected").val() === "0" || $("select#ddlUserTypeEdit option:selected").val() === null) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('Please select User Type !!');
+            return false;
+        }
+
+        var selected = new Array();
+        $("#tblAssignedServicesEdit input[type=checkbox]:checked").each(function () {
+            selected.push(this.value);
+        });
+
+        if (selected === null || selected.length === 0) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('Please assign atleast one Services to new User !!');
+            return false;
+        }
+
+
+        if ($("select#ddlPrivilegeGroupEdit option:selected").val() === "0" || $("select#ddlPrivilegeGroup option:selected").val() === null) {
+            $('#userAddErrorMsgEdit').show();
+            $('#userAddErrorMsgEdit').text('Please assign Privilege Group to new User !!');
+            return false;
+        }
+
+
+
+        var iRecordID = $('#btnEditSave').attr('data-id');
+        var jsonStringVal = '{"iRecordId":' + iRecordID
+                                + ', "sAccountType":"' + 'SO'
+                                + '", "iPrivilegeGroupId": "' + $("select#ddlPrivilegeGroupEdit option:selected").val()
+                                + '", "sAssignedServiceList": "' + selected.join(",")
+                                + '", "sDisplayName":"' + $("#inputUserDisplayNameEdit").val()
+                                + '", "sLoginName":"' + $("#inputUserLoginNameEdit").val()//
+                                + '", "sUserType":"' + $("select#ddlUserTypeEdit option:selected").val()
+                                + '", "sLoginPassword":"' + $("#inputPasswordEdit").val()
+                                + '", "iStatus":' + $("select#ddlUserActiveStatusEdit option:selected").val()
+                                + ', "iLoggedUserId": 1'
+                                + ', "iLoggedAccountId": 1'
+                                + ', "iAction": 2'
+                                + "}"
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveUserDetails")',
+            data: jsonStringVal,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                location.reload();
+            },
+            error: function (error) {
+                alert('error; ' + eval(error));
+            },
+        });
+    }
+
+    $('#btnSearch').on('click', function (evt) {
+        evt.preventDefault();
+        var userDisplayNameSearch = $("#txtUserDisplayNameSearch").val();
+        var userLoginNameSearch = $("#txtUserLoginNameSearch").val();
+
+        if (userDisplayNameSearch == "" && userLoginNameSearch == "") {
+            $('#serachErrorMsg').show();
+            return false;
+        }
+
+        $('#serachErrorMsg').hide();
+        $.ajax({
+            url: '@Url.Action("UserDetails", "ApplicationUsers")',
+            data: { strUserDisplayNameSearch: userDisplayNameSearch, strUserLoginNameSearch: userLoginNameSearch },
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            success: function (data, textStatus, XMLHttpRequest) {
+                $('#UsersDetailsRender').html(data);
+            }
+        });
+        evt.stopPropagation();
+    });
+
+</script>
+    }
+
+<style>
+    .black_overlay {
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+    }
+
+    .white_content {
+        display:none;
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+        border: 2px solid orange;
+        margin-top: 30px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 50%;
+        height: 550px;
+        background-color: white;
+    }
+
+   
+</style>
+<div class="content-wrapper">
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-warning" style="margin: 0px;">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Application User Details</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="lblEmployeeCode" class="col-sm-12 control-label" style="padding-top: 5px;">User Display Name :</label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <input type="text" id="txtUserDisplayNameSearch" name="txtUserDisplayNameSearch" class="form-control" />
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="lblUserLoginName" class="col-sm-12 control-label" style="padding-top: 5px;">User Login Name :</label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <input type="text" id="txtUserLoginNameSearch" name="txtUserLoginNameSearch" class="form-control" maxlength="10" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <button id="btnAddUser" onclick="document.getElementById('addUserDiv').style.display='block';document.getElementById('fade').style.display='block'" class="btn btn-success pull-left" style="margin-left: 20px;"><i class="fa fa-plus"></i><span class="btnSpace">Add New User</span></button>
+                         <button id="btnSearch" class="btn btn-warning pull-right" style="margin-right: 20px;"><i class="fa fa-search"></i><span class="btnSpace">Search</span></button>
+                        <span class="text-danger pull-right" id="serachErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;">Please enter User Login Name to search the Application User Details.</span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box" style="border-top: 2px solid #05731c;">
+                    <div class="box-body">
+                        <div id="UsersDetailsRender">
+                            @{
+                                Html.RenderAction("UserDetails");
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div id="lightEdit" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Edit User Details</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('lightEdit').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Display Name :</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="inputUserDisplayNameEdit" name="inputUserDisplayNameEdit" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+
+                </div>
+
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" style="font-size:smaller; font-style:italic; font-weight:bolder" id="inputUserDisplayNameMsgEdit">Enter valid User Display Name only !!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Login Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="inputUserLoginNameEdit" onblur="return checkuserEdit();" name="inputUserLoginNameEdit" class="form-control" maxlength="20" />
+                    <input type="hidden" id="hdUserLoginNameEdit" name="hdUserLoginNameEdit" class="form-control" />
+                    <input type="hidden" id="hdUserIdToEdit" name="hdUserIdToEdit" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+
+                </div>
+
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" style="font-size:smaller; font-style:italic; font-weight:bolder" id="inputUserLoginNameMsgEdit"> Enter valid alpha numeric User Login Name only !!</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Password :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="inputPasswordEdit" name="inputPasswordEdit" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" id="strength_messageoneedit" style="font-size:smaller; font-style:italic; font-weight:bolder"> Make Strong Password !!</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Type :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <select class="form-control" id="ddlUserTypeEdit" name="ddlUserTypeEdit">
+                        <option value="0">--Select User Type--</option>
+                        <option value="SO-ADMIN">SO-ADMIN</option>
+                        <option value="SO-UR">SO-UR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Assign Services :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    @foreach (var item in @Model.lstServiceDefinition)
+                    {
+                    <table style="width:100%" id="tblAssignedServicesEdit">
+                        <tr>
+                            <td width="10px">
+                                <input type="checkbox" id="@item.iServiceDefinitionID" class="chkclass" value="@item.iServiceDefinitionID" />
+                            </td>
+                            <td id="@item.iServiceDefinitionID" width="100px">
+                                @item.sServiceDescription
+                            </td>
+                        </tr>
+                    </table>
+                    }
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Privilege Group :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <select id="ddlPrivilegeGroupEdit" name="ddlPrivilegeGroupEdit" class="form-control">
+                        <option value="0">--Select Privilege Group--</option>
+                        @foreach (var item in @Model.lstPrivilegeGroup)
+                        {
+                        <option value=@item.GroupID>@item.GroupName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" style="height:2px;"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Active Status :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <select class="form-control" id="ddlUserActiveStatusEdit" name="ddlUserActiveStatusEdit">
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" style="height:2px;"></div>
+        </div>
+
+        <div class="box-footer">
+            <button id="btnEditClose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('lightEdit').style.display = 'none'; document.getElementById('fade').style.display = 'none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <button id="btnEditSave" onclick="return editSaveUserDetails(this);" class="btn btn-success pull-right" style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+            <span class="text-danger pull-right" id="userAddErrorMsgEdit" style="display:none;margin-right: 20px;margin-top:15px;"></span>          
+        </div>
+    </div>
+</div>
+
+<div id="addUserDiv" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Enter New User Details</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('addUserDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Display Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="inputUserDisplayName" maxlength="50" name="inputUserDisplayName" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+
+                </div>
+
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" style="font-size:smaller; font-style:italic; font-weight:bolder" id="userAddErrorMsg111">Enter valid User Display Name only !!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Login Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="inputUserLoginName" onblur="return checkuser();" name="inputUserLoginName" class="form-control" maxlength="30" />
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+
+                </div>
+
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" style="font-size:smaller; font-style:italic; font-weight:bolder" id="userAddErrorMsg11">Enter valid alpha numeric User Login Name only !!</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Password :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="inputPassword" name="inputPassword" class="form-control" maxlength="50" />
+
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;">
+                <div class="col-md-6">
+                </div>
+                <div class="col-md-6">
+                    <span class="text-danger pull-right" id="strength_messageoneadd" style="font-size:smaller; font-style:italic; font-weight:bolder"> Make Strong Password !!</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Type :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <select class="form-control" id="ddlUserTypeAdd" name="ddlUserTypeAdd">
+                        <option value="0">--Select User Type--</option>
+                        <option value="SO-ADMIN">SO-ADMIN</option>
+                        <option value="SO-UR">SO-UR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Assign Services :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    @foreach (var item in @Model.lstServiceDefinition)
+                    {
+                        <table style="width:100%" id="tblAssignedServices">
+                            <tr>
+                                <td width="10px">
+                                    <input type="checkbox" id="@item.iServiceDefinitionID" class="chkclass" value="@item.iServiceDefinitionID" />
+                                </td>
+                                <td id="@item.iServiceDefinitionID" width="100px">
+                                    @item.sServiceDescription
+                                </td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+            <div class="row" style="height:10px;"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Privilege Group :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+
+                    <select id="ddlPrivilegeGroup" name="ddlPrivilegeGroup" class="form-control">
+                        <option value="0">--Select Privilege Group--</option>
+                        @foreach (var item in @Model.lstPrivilegeGroup)
+                        {
+                            <option value=@item.GroupID>@item.GroupName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" style="height:2px;"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> User Active Status :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <select class="form-control" id="ddlUserActiveStatus" name="ddlUserActiveStatus">
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" style="height:2px;"></div>
+        </div>
+
+        <div class="box-footer">
+            <button id="btnclose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('addUserDiv').style.display='none';document.getElementById('fade').style.display='none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <button id="btnaddUser" onclick="return addUserDetails(this);" class="btn btn-success pull-right" disabled style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+            <span class="text-danger pull-right" id="userAddErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;"></span>
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

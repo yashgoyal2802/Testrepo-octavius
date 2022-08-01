@@ -1,0 +1,53 @@
+﻿@model IEnumerable<IncedoReservoir.Areas.InventoryServices.Models.MasterLocationViewModel>
+@{
+    if (Model != null)
+    {
+        <script>
+            function editLocationDt(e) {                
+                var id = e.dataset.id;
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EditLocationDataLoad", "Location")',
+                    data: '{"iLocationId":"' + id + '"}',
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data != null) {                            
+                            $('#txtLocationNameEdit').val(data.LocationName);
+                            $('#hdLocationEdit').val(data.LocationName);
+                            $('#hdLocationToEdit').val(data.LocationId);
+                            $('#btnEditLocation').attr('data-id', id);
+                            document.getElementById('editLocationDiv').style.display = 'block';
+                            document.getElementById('fade').style.display = 'block';
+                        }
+                    },
+                    error: function () {
+                        alert("Error occured!!")
+                    }
+                });
+
+               
+            }
+
+        </script>
+        <table id="tblLocationInfo" class="tblConedInfo table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Location Details</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var mod in Model)
+                    {
+                        <tr>
+                            <td style="max-width:500px;">@mod.LocationName</td>
+                            <td><button id="btnAddUser" data-id="@mod.LocationId" onclick="editLocationDt(this)" class="btn btn-danger pull-right" style="margin-right: 20px;"><i class="fa fa-edit"></i><span class="btnSpace">Edit</span></button>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+                    }
+}

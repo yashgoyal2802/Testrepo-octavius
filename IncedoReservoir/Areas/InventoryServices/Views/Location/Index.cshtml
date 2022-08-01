@@ -1,0 +1,334 @@
+﻿@model IEnumerable<IncedoReservoir.Areas.InventoryServices.Models.MasterLocationViewModel>
+@{
+    Layout = "~/Areas/InventoryServices/Views/Shared/_InventoryServices_Layout.cshtml";
+    ViewBag.Title = "Inventory Services";
+    string errorMessage = ViewBag.ErrorMessage;
+    string errorclass = "has-error";
+    if (string.IsNullOrEmpty(errorMessage))
+    {
+        errorclass = string.Empty;
+    }
+}
+@section scripts {
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"> </script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tblLocationInfo').DataTable({
+                "paging": true, searching: false, // false to disable pagination (or any other option)
+            });
+        });
+
+        $('#btnSearch').on('click', function (evt) {
+            evt.preventDefault();
+
+            var sLocationVal = $("#txtLocationSearch").val();
+
+            if ($("#txtLocationSearch").val() === "" || $("#txtLocationSearch").val() === null) {
+                $('#serachErrorMsg').show();
+                $('#serachErrorMsg').text('Device Location, Please enter valid Device Location to Search !!');
+                return false;
+            }
+
+            $('#serachErrorMsg').hide();
+            $.ajax({
+                url: '@Url.Action("LocationDetails", "Location")',
+                data: { iLocationId: 0, sLocation: sLocationVal, iAction: 1 },
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                success: function (data, textStatus, XMLHttpRequest) {
+                    $('#LocationDetailsRender').html(data);
+                }
+            });
+            evt.stopPropagation();
+        });
+
+        function checkLocationAdd() {
+            var LocationNameVal = $("#txtLocationNameAdd").val();
+
+            if ($("#txtLocationNameAdd").val() === "" || $("#txtLocationNameAdd").val() === null) {
+                $('#locationAddErrorMsg').show();
+                $('#locationAddErrorMsg').text('Device Location cant be empty, Please enter valid Device Location !!');
+                return false;
+            }
+
+            $.ajax({
+                url: '@Url.Action("ValidateLocationName", "Location")',
+                data: { strLocationName: LocationNameVal },
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                success: function (data) {
+                    if (data != 0 && data > 0) {
+                        $('#locationAddErrorMsg').show();
+                        $('#locationAddErrorMsg').text('Device Location already exist ! Please try with different Device Location !!');
+                        $("#btnAddLocation").attr("disabled", true);
+                        return true;
+                    }
+                    else {
+                        $('#locationAddErrorMsg').hide();
+                        $('#locationAddErrorMsg').text('');
+                        $("#btnAddLocation").attr("disabled", false);
+                        return true;
+                    }
+                }
+            });
+        }
+
+        function checkLocationEdit() {
+            var LocationNameVal = $("#txtLocationNameEdit").val();
+
+            if ($("#txtLocationNameEdit").val() === "" || $("#txtLocationNameEdit").val() === null) {
+                $('#locationEditErrorMsg').show();
+                $('#locationEditErrorMsg').text('Device Location cant be empty, Please enter valid Device Location !!');
+                return false;
+            }
+
+            if ($("#txtLocationNameEdit").val().trim() != $("#hdLocationEdit").val().trim()) {
+
+                $.ajax({
+                    url: '@Url.Action("ValidateLocationName", "Location")',
+                    data: { strLocationName: LocationNameVal },
+                    cache: false,
+                    type: "GET",
+                    dataType: "html",
+                    success: function (data) {
+                        if (data != 0 && data > 0) {
+                            $('#locationEditErrorMsg').show();
+                            $('#locationEditErrorMsg').text('Device Location already exist ! Please try with different Device Location !!');
+                            $("#btnEditLocation").attr("disabled", true);
+                            return true;
+                        }
+                        else {
+                            $('#locationAddErrorMsg').hide();
+                            $('#locationAddErrorMsg').text('');
+                            $("#btnEditLocation").attr("disabled", false);
+                            return true;
+                        }
+                    }
+                });
+            }
+        }
+
+        function editLocationDetails(obj)
+        {           
+            if ($("#txtLocationNameEdit").val() === "" || $("#txtLocationNameEdit").val() === null) {
+                $('#locationEditErrorMsg').show();
+                $('#locationEditErrorMsg').text('Device Location cant be empty, Please enter valid Device Location !!');
+                return false;
+            }
+
+            var jsonStringVal = '{"iRecordId": "' + $("#hdLocationToEdit").val()
+                                    + '", "strLocationName": "' + $("#txtLocationNameEdit").val()
+                                    + '", "iAction":2'
+                                    + "}"
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveLocationDetails")',
+                data: jsonStringVal,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    location.reload();
+                    //fnShowMessageBox("Rank Weightage Management", "<br/>Default Rank Attribute Weightages have been set successfully!<br /> <br/> Expert Portal Team", 1, function abc() { }, null);
+                },
+                error: function (error) {
+                    alert('error; ' + eval(error));
+                },
+            });
+        }
+
+        function addLocationDetails(obj) {
+
+            if ($("#txtLocationNameAdd").val() === "" || $("#txtLocationNameAdd").val() === null) {
+                $('#locationAddErrorMsg').show();
+                $('#locationAddErrorMsg').text('Device Location cant be empty, Please enter valid Device Location !!');
+                return false;
+            }
+
+            var jsonStringVal = '{"iRecordId":"0'
+                                    + '", "strLocationName": "' + $("#txtLocationNameAdd").val()
+                                    + '", "iAction":1'
+                                    + "}"
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveLocationDetails")',
+                data: jsonStringVal,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    location.reload();
+                    //fnShowMessageBox("Rank Weightage Management", "<br/>Default Rank Attribute Weightages have been set successfully!<br /> <br/> Expert Portal Team", 1, function abc() { }, null);
+                },
+                error: function (error) {
+                    alert('error; ' + eval(error));
+                },
+            });
+        }
+    </script>
+}
+<style>
+    .black_overlay {
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+    }
+
+    .white_content {
+        display: none;
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+        border: 2px solid orange;
+        margin-top: 30px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 50%;
+        height: 550px;
+        background-color: white;
+    }
+</style>
+
+<div class="content-wrapper">
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-warning" style="margin: 0px;">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Master Devices Location</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-12 control-label" style="padding-top: 5px;">Location :</label>
+                                </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <input type="text" id="txtLocationSearch" name="txtLocationSearch" class="form-control" maxlength="30" />
+                            </div>
+
+                            <div class="col-xs-2">
+
+                            </div>
+                            <div class="col-xs-2">
+                            </div>
+
+                            <div class="col-xs-2">
+
+                            </div>
+                            <div class="col-xs-2">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button id="btnAddNewLocation" onclick="document.getElementById('addLocationDiv').style.display='block';document.getElementById('fade').style.display='block'" class="btn btn-success pull-left" style="margin-right: 20px;"><i class="fa fa-plus"></i><span class="btnSpace">Add New Location</span></button>
+                        <span class="text-danger" id="serachErrorMsg" style="display:none;">Please Enter Devices Location Search !!</span>
+                        <button id="btnSearch" class="btn btn-warning pull-right" style="margin-right: 20px;"><i class="fa fa-search"></i><span class="btnSpace">Search</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box " style="border-top: 2px solid #05731c;">
+                    <div class="box-body">
+                        <div id="LocationDetailsRender">
+                            @{
+                                Html.RenderAction("LocationDetails");
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="addLocationDiv" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Add Master Devices Location</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('addLocationDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Location Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="txtLocationNameAdd" onblur="return checkLocationAdd();" name="txtLocationNameAdd" class="form-control" maxlength="30" />
+
+                </div>
+            </div>
+            <div class="row" style="height:4px;"></div>
+        </div>
+        <div class="box-footer">
+            <button id="btnAddLocation" onclick="return addLocationDetails(this);" class="btn btn-success pull-right" disabled style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+          
+            <button id="btnclose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('addLocationDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <span class="text-danger pull-right" id="locationAddErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;"></span>
+        </div>
+    </div>
+</div>
+
+<div id="editLocationDiv" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Edit Master Devices Location</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('editLocationDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Location Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="txtLocationNameEdit" onblur="return checkLocationEdit();" name="txtLocationNameEdit" class="form-control" maxlength="30" />
+                    <input type="hidden" id="hdLocationEdit" name="hdLocationEdit" class="form-control" />
+                    <input type="hidden" id="hdLocationToEdit" name="hdLocationToEdit" class="form-control" />
+                </div>
+            </div>
+            <div class="row" style="height:4px;"></div>
+        </div>
+        <div class="box-footer">
+            <button id="btnEditLocation" onclick="return editLocationDetails(this);" class="btn btn-success pull-right" disabled style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+            
+            <button id="btnclose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('editLocationDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <span class="text-danger pull-right" id="locationEditErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;"></span>
+        </div>
+    </div>
+</div>
+@*<div id="fade" class="black_overlay"></div>*@

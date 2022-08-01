@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title - Incedo Reservoir Tool</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+
+    @Styles.Render("~/Content/css")    
+    @Styles.Render("~/Content")
+    @Styles.Render("~/Content/skin")
+
+    
+
+    <link href="~/Content/skin/_all-skins.min.css" rel="stylesheet" />
+  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">   
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+   
+</head>
+<body class="hold-transition login-page" style="background-image: linear-gradient(#808080, #FFFFFF);min-height: 100%;margin:0;">
+
+    @RenderBody()
+
+    @Scripts.Render("~/bundles/jquery")
+    <!-- jQuery UI 1.11.4 -->
+    @*@Scripts.Render("~/bundles/jqueryui")*@
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <!-- Bootstrap 3.3.5 -->
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

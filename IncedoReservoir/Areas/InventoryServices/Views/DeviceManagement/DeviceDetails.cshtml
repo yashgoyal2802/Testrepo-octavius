@@ -1,0 +1,79 @@
+﻿@model IEnumerable<IncedoReservoir.Areas.InventoryServices.Models.DevicesDetailsViewModel>
+@{
+    if (Model != null && Model.Count() > 0)
+    {
+        <script>
+            function editdevice(e)
+            {               
+                var id = e.dataset.id;
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EditDeviceDataLoad", "DeviceManagement")',
+                    data: '{"iDeviceId":"' + id + '"}',
+                    dataType: "json"  ,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data != null)
+                        {
+                            debugger;
+                            $('#ddlServiceNameEdit').val(data.ServiceName).change();
+                            $('#txtDeviceNameEdit').val(data.DeviceName);
+                            $('#hdDeviceNameEdit').val(data.DeviceName);
+                            $('#txtDeviceUserNameEdit').val(data.DeviceUserName);
+                            $('#hdDeviceIdToEdit').val(data.DeviceId);
+                            $('#ddlLocationNameEdit').val(data.LocationName).change();
+                            $("#ddlDeviceStatusEdit").val(data.DeviceStatus).change();
+                            $("#txtActiveDateEdit").val(data.ActiveDate);
+                            $("#txtPasswordOneEdit").val(data.EncryptedPasswordOne);
+                            $("#txtPasswordTwoEdit").val(data.EncryptedPasswordTwo);
+                            $('#txtRemarksEdit').val('');
+                            $('#btnEditSave').attr('data-id', id);
+                            document.getElementById('dvDeviceEdit').style.display = 'block';
+                            document.getElementById('fade').style.display = 'block';
+                        }
+                },
+                error: function() {
+                    alert("Error occured!!")
+                }
+            });
+            }
+
+        </script>
+        <table id="tblDeviceInfo" class="tblConedInfo table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+
+                    <th>Service Name</th>
+                    <th>Device Name</th>
+                    <th>Location Name</th>
+                    <th>Device Status</th>
+                    <th>Active Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var mod in Model)
+                    {
+                        <tr>
+                            <td style="max-width:500px;">@mod.ServiceName</td>
+                            <td>@mod.DeviceName</td>
+                            <td>@mod.LocationName</td>
+                            <td>@mod.DeviceStatus</td>
+                            <td>@mod.ActiveDate</td>
+                            <td><button id="btnEditDevice" data-id="@mod.DeviceId" onclick="editdevice(this)" class="btn btn-danger pull-right" style="margin-right: 20px;"><i class="fa fa-edit"></i><span class="btnSpace">Edit Device</span></button>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h4><i class="icon fa fa-ban"></i>Alert !</h4>
+                            None Of The Device Details Found, Please Try Again !!
+                        </div>
+
+                    }
+}

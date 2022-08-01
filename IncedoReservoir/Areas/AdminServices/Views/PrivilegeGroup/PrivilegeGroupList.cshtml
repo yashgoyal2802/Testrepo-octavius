@@ -1,0 +1,45 @@
+﻿@model IncedoReservoir.Areas.AdminServices.Models.PrivilegeGroupMainModel
+@{
+    Layout = null;
+}
+@{
+    if (Model.lstGetPrivilegeGroupName != null && Model.lstGetPrivilegeGroupName.Count > 0)
+    {
+        <table id="tblCustomerInfo" class="tblConedInfo table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Privilege  Group Name</th>
+                    @*<th>Create Date</th>*@
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var mod in Model.lstGetPrivilegeGroupName)
+                    {
+                        <tr>
+                            <td style="max-width:500px;">@mod.GroupName</td>
+                            @*<td>@mod.C</td>*@
+                            <td>@mod.ActiveStatus</td>
+                            <td><button id="btnAddUser" data-id="@mod.GroupID" onclick="editPrivilegeGroup(this)" class="btn btn-danger pull-right" style="margin-right: 20px;"><i class="fa fa-edit"></i><span class="btnSpace">Edit Privilege</span></button>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h4><i class="icon fa fa-ban"></i>Alert !</h4>
+                            None Of The Privilege Group Found, Please Try Again !!
+                        </div>
+
+                    }
+
+                   
+
+                   
+}

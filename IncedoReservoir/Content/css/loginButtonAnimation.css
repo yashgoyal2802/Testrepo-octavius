@@ -1,0 +1,78 @@
+﻿.headerLogoutButton {
+  border-radius: 4px;
+  background-color: #FF0000;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 8px;
+  width: 100px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.headerLogoutButton span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.headerLogoutButton span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.headerLogoutButton:hover span {
+  padding-right: 20px;
+}
+
+.headerLogoutButton:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+
+.headerSwitchButton {
+  border-radius: 4px;
+  background-color: #4169E1;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 8px;
+  width: 150px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.headerSwitchButton span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.headerSwitchButton span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.headerSwitchButton:hover span {
+  padding-right: 20px;
+}
+
+.headerSwitchButton:hover span:after {
+  opacity: 1;
+  right: 0;
+}

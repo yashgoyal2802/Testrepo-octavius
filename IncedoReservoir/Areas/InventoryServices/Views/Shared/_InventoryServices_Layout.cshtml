@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Inventory Services</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    @Styles.Render("~/Content")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/css")
+    @Styles.Render("~/Content/skin")
+    <link href="http://fonts.googleapis.com/css?family=Satisfy"  type="text/css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/themes/blitzer/jquery-ui.css" rel="Stylesheet" type="text/css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    @if (IsSectionDefined("AddToHead"))
+    {
+        @RenderSection("AddToHead", required: false)
+    }
+    <style>
+        .dont-break-out {
+            /* These are technically the same, but use both */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            -ms-word-break: break-all;
+            /* This is the dangerous one in WebKit, as it breaks things wherever */
+            word-break: break-all;
+            /* Instead use this non-standard one: */
+            word-break: break-word;
+            /* Adds a hyphen where the word breaks, if supported (No Blink) */
+            -ms-hyphens: auto;
+            -moz-hyphens: auto;
+            -webkit-hyphens: auto;
+            hyphens: auto;
+        }
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <div id="fade" class="black_overlay" style="display:none"></div>
+        <header class="main-header">
+            <!-- Logo -->
+            <a title="Administration Services" target="_blank" class="logo" href="https://www.incedoinc.com/" style="cursor:pointer">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini" style="color: #05731c;"><b>Inventory Services</b></span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg" style="color:#05731c">
+                    <img src="~/content/images/indecologo.png" />
+                </span>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                @*<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>*@
+                <div class="navbar-custom-menu" style="padding-right:30px;">
+                    <a href="https://www.incedoinc.com/" target="_blank">
+                    </a>
+                    @{ using (Html.BeginForm("SessionLogOut", "Login", new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button id="btnLogout" onclick="javascript:document.getElementById('logoutForm').submit()" class="headerLogoutButton pull-right" style="margin-right: 10px;"><i class="fa fa-sign-out"></i><span class="btnSpace">Logout</span></button>
+                        }
+                    }
+
+                    @{ using (Html.BeginForm("Index", "SwitchBoard", new { area = "" }, FormMethod.Post, new { id = "switchboardForm", @class = "navbar-right" }))
+                        {
+                            <button id="btnSwitchBoard" onclick="javascript: document.getElementById('switchboardForm').submit()" class="headerSwitchButton pull-right" style="margin-right: 10px;"><i class="fa fa-server"></i><span class="btnSpace">Switch Board</span></button>
+                        }
+                    }
+                </div>
+            </nav>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="~/content/images/000.png" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                        <p>
+                            @if (HttpContext.Current.Session["UserName"] != null)
+                            {
+                                @Session["UserName"]
+                            }
+                            else
+                            {
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li>@Html.ActionLink("Session Out", "SessionLogOut", "Login", new { area = "" }, htmlAttributes: new { id = "sessionLogout" })</li>
+                                </ul>
+                            }
+                        </p>
+                        <a href="#"><i class="fa fa-circle text-success"></i>Online</a>
+                    </div>
+                </div>
+                <!-- sidebar menu: : style can be found in sidebar.less -->
+                <ul class="sidebar-menu">
+                    <li class="header">Start Navigation</li>
+
+                    @{
+                        Html.RenderAction("TreeMenuNodes");
+                    }
+                </ul>
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+
+        @RenderBody()
+
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0.0
+            </div>
+            @{
+                var yearString = String.Format("{0}-{1}", (DateTime.Now.Year - 1), DateTime.Now.Year);
+            }
+            <strong>Copyright &copy; @yearString <a href="https://www.incedoinc.com/" target="_blank">Incedo Inc.</a></strong>
+        </footer>
+
+    </div>
+    <!-- jQuery 2.1.4 -->
+    <!-- jQuery 2.1.4 -->
+    @*@Scripts.Render("~/bundles/jquery")*@
+    <!-- jQuery UI 1.11.4 -->
+    @*@Scripts.Render("~/bundles/jqueryui")*@
+
+    <!-- Bootstrap 3.3.5 -->
+    @Scripts.Render("~/bundles/bootstrap")
+
+    @RenderSection("scripts", required: false)
+
+    <script>
+        // Restricts input for each element in the set of matched elements to the given inputFilter.
+
+        function ajaxindicatorstart(text) {
+            if (jQuery('body').find('#resultLoading').attr('id') != 'resultLoading') {
+                jQuery('body').append('<div id="resultLoading" style="display:none"><div><img src="@Url.Content("~/content/images/loading.gif")"><div>' + text + '</div></div><div class="bg"></div></div>');
+            }
+
+            jQuery('#resultLoading').css({
+                'width': '100%',
+                'height': '100%',
+                'position': 'fixed',
+                'z-index': '10000000',
+                'top': '0',
+                'left': '0',
+                'right': '0',
+                'bottom': '0',
+                'margin': 'auto'
+            });
+
+            jQuery('#resultLoading .bg').css({
+                'background': '#000000',
+                'opacity': '0.7',
+                'width': '100%',
+                'height': '100%',
+                'position': 'absolute',
+                'top': '0'
+            });
+
+            jQuery('#resultLoading>div:first').css({
+                'width': '250px',
+                'height': '75px',
+                'text-align': 'center',
+                'position': 'fixed',
+                'top': '0',
+                'left': '0',
+                'right': '0',
+                'bottom': '0',
+                'margin': 'auto',
+                'font-size': '16px',
+                'z-index': '10',
+                'color': '#ffffff'
+
+            });
+
+            jQuery('#resultLoading .bg').height('100%');
+            jQuery('#resultLoading').fadeIn(300);
+            jQuery('body').css('cursor', 'wait');
+        }
+
+        function ajaxindicatorstop() {
+            jQuery('#resultLoading .bg').height('100%');
+            jQuery('#resultLoading').fadeOut(300);
+            jQuery('body').css('cursor', 'default');
+        }
+
+        jQuery(document).ajaxStart(function () {
+            //show ajax indicator
+            ajaxindicatorstart('Loading... please wait...');
+        }).ajaxStop(function () {
+            //hide ajax indicator
+            ajaxindicatorstop();
+        });
+    </script>
+</body>
+</html>

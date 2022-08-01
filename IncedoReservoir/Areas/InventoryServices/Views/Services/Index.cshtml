@@ -1,0 +1,342 @@
+﻿@model IEnumerable<IncedoReservoir.Areas.InventoryServices.Models.MasterServicesViewModel>
+@{
+    Layout = "~/Areas/InventoryServices/Views/Shared/_InventoryServices_Layout.cshtml";
+    ViewBag.Title = "Inventory Services";
+    string errorMessage = ViewBag.ErrorMessage;
+    string errorclass = "has-error";
+    if (string.IsNullOrEmpty(errorMessage))
+    {
+        errorclass = string.Empty;
+    }
+}
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+@section scripts {
+
+   
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tblServicesInfo').DataTable({
+                searching: false,
+                "bFilter": false,
+                "bLengthChange": true,
+                "order": [],
+                "columnDefs": [{ orderable: false, targets: -1 }]
+            });
+        });
+
+        $('#btnSearch').on('click', function (evt) {
+            evt.preventDefault();
+
+            var sServiceNameVal = $("#txtServiceSearch").val();
+
+            if ($("#txtServiceSearch").val() === "" || $("#txtServiceSearch").val() === null) {
+                $('#serachErrorMsg').show();
+                $('#serachErrorMsg').text('Please enter valid Service to Search !!');
+                return false;
+            }
+
+            $('#serachErrorMsg').hide();
+            $.ajax({
+                url: '@Url.Action("ServiceDetails", "Services")',
+                data: { iServiceId: 0, sServiceName: sServiceNameVal, iAction: 1 },
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                success: function (data, textStatus, XMLHttpRequest) {
+                    $('#ServiceDetailsRender').html(data);
+                }
+            });
+            evt.stopPropagation();
+        });
+
+        function checkServiceAdd() {
+            var ServiceNameVal = $("#txtServiceNameAdd").val();
+
+            if ($("#txtServiceNameAdd").val() === "" || $("#txtServiceNameAdd").val() === null) {
+                $('#ServiceAddErrorMsg').show();
+                $('#ServiceAddErrorMsg').text('Service Name cant be empty, Please enter valid Service Name !!');
+                return false;
+            }
+
+            $.ajax({
+                url: '@Url.Action("ValidateServiceName", "Services")',
+                data: { strServiceName: ServiceNameVal },
+                cache: false,
+                type: "GET",
+                dataType: "html",
+                success: function (data) {
+                    if (data != 0 && data > 0) {
+                        $('#ServiceAddErrorMsg').show();
+                        $('#ServiceAddErrorMsg').text('Service Name already exist ! Please try with different Service Name !!');
+                        $("#btnAddService").attr("disabled", true);
+                        return true;
+                    }
+                    else {
+                        $('#ServiceAddErrorMsg').hide();
+                        $('#ServiceAddErrorMsg').text('');
+                        $("#btnAddService").attr("disabled", false);
+                        return true;
+                    }
+                }
+            });
+        }
+
+        function checkServiceEdit() {
+            var ServiceNameVal = $("#txtServiceNameEdit").val();
+
+            if ($("#txtServiceNameEdit").val() === "" || $("#txtServiceNameEdit").val() === null) {
+                $('#ServiceEditErrorMsg').show();
+                $('#ServiceEditErrorMsg').text('Service Name cant be empty, Please enter valid Service Name !!');
+                return false;
+            }
+
+            if ($("#txtServiceNameEdit").val().trim() != $("#hdServiceEdit").val().trim()) {
+
+                $.ajax({
+                    url: '@Url.Action("ValidateServiceName", "Services")',
+                    data: { strServiceName: ServiceNameVal },
+                    cache: false,
+                    type: "GET",
+                    dataType: "html",
+                    success: function (data) {
+                        if (data != 0 && data > 0) {
+                            $('#ServiceEditErrorMsg').show();
+                            $('#ServiceEditErrorMsg').text('Service Name already exist ! Please try with different Service Name !!');
+                            $("#btnEditService").attr("disabled", true);
+                            return true;
+                        }
+                        else {
+                            $('#ServiceEditErrorMsg').hide();
+                            $('#ServiceEditErrorMsg').text('');
+                            $("#btnEditService").attr("disabled", false);
+                            return true;
+                        }
+                    }
+                });
+            }
+        }
+
+
+        function editServiceDetails(obj) {
+            if ($("#txtServiceNameEdit").val() === "" || $("#txtServiceNameEdit").val() === null) {
+                $('#ServiceEditErrorMsg').show();
+                $('#ServiceEditErrorMsg').text('Service Name cant be empty, Please enter valid Service Name !!');
+                return false;
+            }
+
+            var jsonStringVal = '{"iRecordId": "' + $("#hdServiceToEdit").val()
+                                    + '", "strServiceName": "' + $("#txtServiceNameEdit").val()
+                                    + '", "iAction":2'
+                                    + "}"
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveServiceDetails")',
+                data: jsonStringVal,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    location.reload();
+                    //fnShowMessageBox("Rank Weightage Management", "<br/>Default Rank Attribute Weightages have been set successfully!<br /> <br/> Expert Portal Team", 1, function abc() { }, null);
+                },
+                error: function (error) {
+                    alert('error; ' + eval(error));
+                },
+            });
+        }
+
+        function addServiceDetails(obj) {
+
+            if ($("#txtServiceNameAdd").val() === "" || $("#txtServiceNameAdd").val() === null) {
+                $('#ServiceAddErrorMsg').show();
+                $('#ServiceAddErrorMsg').text('Service Name cant be empty, Please enter valid Service Name !!');
+                return false;
+            }
+
+            var jsonStringVal = '{"iRecordId":"0'
+                                    + '", "strServiceName": "' + $("#txtServiceNameAdd").val()
+                                    + '", "iAction":1'
+                                    + "}"
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveServiceDetails")',
+                data: jsonStringVal,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    location.reload();
+                    //fnShowMessageBox("Rank Weightage Management", "<br/>Default Rank Attribute Weightages have been set successfully!<br /> <br/> Expert Portal Team", 1, function abc() { }, null);
+                },
+                error: function (error) {
+                    alert('error; ' + eval(error));
+                },
+            });
+        }
+
+</script>
+
+<script type="text/javascript" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"> </script>
+}
+
+<style>
+    .black_overlay {
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+    }
+
+    .white_content {
+        display: none;
+        position: fixed;
+        background-color: rgb(0,0,0); /* Black fallback color */
+        background-color: rgba(53, 47, 47, 0.9); /*rgba(0,0,0, 0.9);*/ /* Black w/opacity */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        transition: 0.5s;
+        background-repeat: repeat;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000000;
+        border: 2px solid orange;
+        margin-top: 30px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 50%;
+        height: 550px;
+        background-color: white;
+    }
+</style>
+
+<div class="content-wrapper">
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-warning" style="margin: 0px;">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Master Service Details</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-12 control-label" style="padding-top: 5px;">Service :</label>
+                                </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <input type="text" id="txtServiceSearch" name="txtServiceSearch" class="form-control" maxlength="30" />
+                            </div>
+
+                            <div class="col-xs-2">
+
+                            </div>
+                            <div class="col-xs-2">
+                            </div>
+
+                            <div class="col-xs-2">
+
+                            </div>
+                            <div class="col-xs-2">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button id="btnAddNewService" onclick="document.getElementById('addServiceDiv').style.display = 'block'; document.getElementById('fade').style.display = 'block'" class="btn btn-success pull-left" style="margin-left: 20px;"><i class="fa fa-plus"></i><span class="btnSpace">Add New Service</span></button>
+                        
+                        <button id="btnSearch" class="btn btn-warning pull-right" style="margin-right: 20px;"><i class="fa fa-search"></i><span class="btnSpace">Search</span></button>
+                        <span class="text-danger pull-right" id="serachErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;">Please Enter Service Details Search !!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box" style="border-top: 2px solid #05731c;">
+                    <div class="box-body">
+                        <div id="ServiceDetailsRender">
+                            @{
+                                Html.RenderAction("ServiceDetails");
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="addServiceDiv" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Add Master Service</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('addServiceDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Service Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="txtServiceNameAdd" onblur="return checkServiceAdd();" name="txtServiceNameAdd" class="form-control" maxlength="30" />
+
+                </div>
+            </div>
+            <div class="row" style="height:4px;"></div>
+        </div>
+        <div class="box-footer">
+            <button id="btnAddService" onclick="return addServiceDetails(this);" class="btn btn-success pull-right" disabled style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+           
+            <button id="btnclose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('addServiceDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <span class="text-danger pull-right" id="ServiceAddErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;"></span>
+        </div>
+    </div>
+</div>
+
+<div id="editServiceDiv" class="white_content">
+    <div style="margin: 0px;">
+        <div class="box-header with-border" style="border-bottom-color:green; border-bottom:dashed;border-width:2px;">
+            <h3 class="box-title">Edit Master Devices Service</h3>
+            <img class="pull-right" src="~/content/Images/closepop.jpeg" style="cursor:pointer; height:30px; width:30px;margin-top:-5px;" onclick="document.getElementById('editServiceDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'" />
+        </div>
+        <div class="box-body">
+            <div class="row" style="height:2px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lblsgn" class="col-sm-12 control-label" style="padding-top: 5px;"><i class="fa fa-hand-o-right"></i> Service Name :</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <input type="text" id="txtServiceNameEdit" onblur="return checkServiceEdit();" name="txtServiceNameEdit" class="form-control" maxlength="30" />
+                    <input type="hidden" id="hdServiceEdit" name="hdServiceEdit" class="form-control" />
+                    <input type="hidden" id="hdServiceToEdit" name="hdServiceToEdit" class="form-control" />
+                </div>
+            </div>
+            <div class="row" style="height:4px;"></div>
+        </div>
+        <div class="box-footer">
+            <button id="btnEditService" onclick="return editServiceDetails(this);" class="btn btn-success pull-right" disabled style="margin-right: 20px;"><i class="fa fa-save"></i><span class="btnSpace">Save</span></button>
+           
+            <button id="btnclose" class="btn btn-danger pull-left" style="margin-left: 20px;" onclick="document.getElementById('editServiceDiv').style.display = 'none'; document.getElementById('fade').style.display = 'none'"><i class="fa fa-times"></i><span class="btnSpace">Cancel</span></button>
+            <span class="text-danger  pull-right" id="ServiceEditErrorMsg" style="display:none;margin-right: 20px;margin-top:15px;"></span>
+        </div>
+    </div>
+</div>
