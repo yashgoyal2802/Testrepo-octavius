@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Incedo_Octavius_Demo_2.Models.KOL_Image>
+@{ ViewBag.Title = "Index"; }
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.css">
+    <title>Index</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="justify-content-between">
+        <h2 class="text-dark text-center alert-heading">
+            KOL
+        </h2>
+        <br />
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+<div class="col-md-3">
+    <div class="card">
+        <img src="@item.Image_URL" class="card-img-top rounded-circle" alt="Dummy Profile Pic" width="300" height="300">
+        <div class="card-body">
+            <h5 class="card-title">@item.First_Name @item.Last_Name</h5>
+            <h5>
+                @Html.ActionLink("Details", "Details", "KOL_Details", new { id = item.kolID }, null)
+            </h5>
+        </div>
+    </div>
+</div>}
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

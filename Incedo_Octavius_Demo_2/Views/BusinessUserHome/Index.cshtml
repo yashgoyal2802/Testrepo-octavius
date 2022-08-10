@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Business User Home Page";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+
+    <br />
+    <br />
+    <br />
+    <br />
+
+
+    <div class="container-fluid text-center" style="color:black">
+
+        <div class="row container-fluid">
+            <div class="col-md-6 d-flex align-items-center justify-content-center" style="background-color: #2161a2; padding: 50px">
+                <h2>
+                    @Html.ActionLink("Degree", "Index", "BusinessUserDegreeModels", routeValues: null, htmlAttributes: new { @class = "btn btn-outline-info btn-lg", @role = "button" })
+                </h2>
+            </div>
+            <div class="col-md-6 d-flex align-items-center justify-content-center" style="background-color: #2161a2; padding: 50px">
+                <h2>
+                    @Html.ActionLink("Speciality", "Index", "BusinessUserSpecialtyModels", routeValues: null, htmlAttributes: new { @class = "btn btn-outline-info btn-lg", @role = "button" })
+                </h2>
+            </div>
+        </div>
+        
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    @*@{Html.RenderAction("Index", "BusinessUserDegreeModels"); }*@
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>

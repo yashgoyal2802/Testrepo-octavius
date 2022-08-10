@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Incedo_Octavius_Demo_2.Models.ProfileStatusModel>
+@{
+    Layout = "";
+}
+<div class="container">
+    <form action="/KOL_Image/Index" method="post">
+        <div class="row container">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 d-flex align-items-center justify-content-center" style="background-color: #1c324f; padding: 20px ">
+                    <button name="profile" type="submit" class="btn btn-outline-info" value=@item.ProfileStatusID>@Html.DisplayFor(modelItem => item.ProfileStatus)</button>
+                    @*@Html.ActionLink(item.ProfileStatus, "Index", "KOL_Image", routeValues: null, htmlAttributes: new { @class = "btn btn-outline-info btn-lg", @role = "button", @name="profile" })*@
+
+
+
+                </div>
+            }
+            @foreach (var item in ViewBag.KOLCount)
+            {
+                <div class="col-md-4 d-flex align-items-center justify-content-center" style="background-color: cornflowerblue; padding: 20px">
+                    <span>@item</span>
+                </div>
+            }
+        </div>
+    </form>
+</div>
